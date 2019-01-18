@@ -5,3 +5,5 @@
 `scrapy crawl shopinfo`
 ### dianping爬虫用于获取店铺下的所有评论信息
 `scrapy crawl dianping`
+---
+### 数据库方面采用sqlalachemy+mysql进行存储
