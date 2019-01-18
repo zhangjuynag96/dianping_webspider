@@ -8,8 +8,8 @@
 `scrapy crawl dianping`
 
 ---
-## 数据库与存储
-### 数据库采用sqlalachemy+mysql进行存储
+## 数据库与存储:
+ 数据库采用sqlalachemy+mysql进行存储
 
 ---
 ## Settings设置:
