@@ -21,3 +21,7 @@
 ---
 ## MiddleWares:
 添加了UserAgentmiddleware与Cookiesmiddleware来获取随机的header与cookies
+
+---
+## 配置重爬:
+在爬虫完成后删除pause文件夹，重新运行爬虫即可开始重爬.

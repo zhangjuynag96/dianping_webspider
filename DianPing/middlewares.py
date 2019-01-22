@@ -6,17 +6,9 @@
 # https://doc.scrapy.org/en/latest/topics/spider-middleware.html
 
 from scrapy import signals
-from selenium import webdriver
-from selenium.common.exceptions import TimeoutException
-from selenium.webdriver.common.by import By
 import time
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.keys import Keys
 from scrapy.http import HtmlResponse
-from logging import getLogger
 import json
-import redis
 import random
 from DianPing.UserAgent import agents
 from scrapy.downloadermiddlewares.useragent import UserAgentMiddleware

@@ -20,7 +20,7 @@ NEWSPIDER_MODULE = 'DianPing.spiders'
 
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = False
-HTTPERROR_ALLOWED_CODES = [400]
+#HTTPERROR_ALLOWED_CODES = [400]
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 CONCURRENT_REQUESTS = 1
@@ -95,15 +95,15 @@ ITEM_PIPELINES = {
 
 LOG_LEVEL ='INFO'
 
-#CLOSESPIDER_TIMEOUT = 600
+CLOSESPIDER_TIMEOUT = 32400
 
 #暂停续爬
-#JOBDIR = 'pause'
+JOBDIR = 'pause'
 
 #MYSQL数据库设置
 MYSQL_HOST = 'localhost'
-MYSQL_DATABASE = 'DianPing'
+MYSQL_DATABASE = 'dianping'
 MYSQL_PORT = 3306
-MYSQL_USER = 'root'
-MYSQL_PASSWORD = '123456'
+MYSQL_USER = 'spyder'
+MYSQL_PASSWORD = 'spyder@tbs2016'
 

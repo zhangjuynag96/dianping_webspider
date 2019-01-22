@@ -30,7 +30,7 @@ class ShopinfoSpider(scrapy.Spider):
         sess = session()
         Base = declarative_base()
         shopinfo = type('shopinfo',(Base,ShopInfoTemplate),{'__tablename__':'shopinfo'})
-        ret = sess.query(shopinfo.shopId,shopinfo.reviewCount).all()
+        ret = sess.query(shopinfo.shopid,shopinfo.reviewcount).all()
         for i in ret:
             shopid = i[0]
             reviewCount = i[1]
@@ -82,48 +82,48 @@ class ShopinfoSpider(scrapy.Spider):
                 yield emoji_item
 
             item = CommentsItem()
-            item['shopName'] = shopinfo[0][0]
-            item['shopId'] = shopinfo[0][1]
-            item['reviewId'] = s_comment[0]
-            item['addTime'] = s_comment[1]
-            item['lastTime'] = s_comment[2]
-            item['followNoteNo'] = s_comment[3]
-            item['browseCount'] = s_comment[4]
+            item['shopname'] = shopinfo[0][0]
+            item['shopid'] = shopinfo[0][1]
+            item['reviewid'] = s_comment[0]
+            item['addtime'] = s_comment[1]
+            item['lasttime'] = s_comment[2]
+            item['follownoteno'] = s_comment[3]
+            item['browsecount'] = s_comment[4]
             item['star'] = s_comment[5]
             
             #将评论内容中的emoji表情的url链接替换为emoji表情的对应文字
             result = re.sub(u'<img.*?alt=\\\\"\\[','emoji(',s_comment[6])
             result = re.sub(u'\\]\\\\">',')',result)
             result = re.sub('<br>','',result)
-            item['reviewBody'] = result
+            item['reviewbody'] = result
 
-            item['avgPrice'] = s_comment[7]
-            item['userNickName'] = s_comment[8]
-            item['userPower'] = s_comment[9]
-            item['contentId'] = s_comment[10]
+            item['avgprice'] = s_comment[7]
+            item['usernickname'] = s_comment[8]
+            item['userpower'] = s_comment[9]
+            item['contentid'] = s_comment[10]
             yield item
 
     def get_comment(self,response):
         #使用jsonpath_rw_ext对获得的数据进行提取
         html = json.loads(response.text)
 
-        shopId = jsonpath_rw_ext.match('$..shopId',html)
-        shopName = jsonpath_rw_ext.match('$..shopName',html)
-        reviewId = jsonpath_rw_ext.match('$..reviewId',html)
-        addTime = jsonpath_rw_ext.match('$..addTime',html)
-        lastTime = jsonpath_rw_ext.match('$..lastTime',html)
-        followNoteNo = jsonpath_rw_ext.match('$..followNoteNo',html)
-        browseCount = jsonpath_rw_ext.match('$..browseCount',html)
+        shopid = jsonpath_rw_ext.match('$..shopId',html)
+        shopname = jsonpath_rw_ext.match('$..shopName',html)
+        reviewid = jsonpath_rw_ext.match('$..reviewId',html)
+        addtime = jsonpath_rw_ext.match('$..addTime',html)
+        lasttime = jsonpath_rw_ext.match('$..lastTime',html)
+        follownoteno = jsonpath_rw_ext.match('$..followNoteNo',html)
+        browsecount = jsonpath_rw_ext.match('$..browseCount',html)
         star = jsonpath_rw_ext.match('$..star',html)
-        reviewBody = jsonpath_rw_ext.match('$..reviewBody',html)
-        avgPrice = jsonpath_rw_ext.match('$..avgPrice',html)
-        userNickName = jsonpath_rw_ext.match('$..userNickName',html)
-        userPower = jsonpath_rw_ext.match('$..userPower',html)
-        contentId = jsonpath_rw_ext.match('$..contentId',html)
+        reviewbody = jsonpath_rw_ext.match('$..reviewBody',html)
+        avgprice = jsonpath_rw_ext.match('$..avgPrice',html)
+        usernickname = jsonpath_rw_ext.match('$..userNickName',html)
+        userpower = jsonpath_rw_ext.match('$..userPower',html)
+        contentid = jsonpath_rw_ext.match('$..contentId',html)
 
-        for i in range(10):
+        for i in range(0,len(usernickname)):
             #提取评论内容中的emoji表情url，并存入数据库的emoji表中
-            emoji = re.findall('<img class="emoji-img" src="(.*?)" alt="\\[(.*?)\\]">',str(reviewBody[i]))
+            emoji = re.findall('<img class="emoji-img" src="(.*?)" alt="\\[(.*?)\\]">',str(reviewbody[i]))
             for j in emoji:
                 emoji_item = EmojiItem()
                 emoji_item['emoji_url'] = j[0]
@@ -131,25 +131,25 @@ class ShopinfoSpider(scrapy.Spider):
                 yield emoji_item
 
             item = CommentsItem()
-            item['shopName'] = shopName[0]
-            item['shopId'] = shopId[0]
-            item['reviewId'] = str(reviewId[i])
-            item['addTime'] = addTime[i]
-            item['lastTime'] = lastTime[i]
-            item['followNoteNo'] = str(followNoteNo[i])
-            item['browseCount'] = str(browseCount[i])
+            item['shopname'] = shopname[0]
+            item['shopid'] = shopid[0]
+            item['reviewid'] = str(reviewid[i])
+            item['addtime'] = addtime[i]
+            item['lasttime'] = lasttime[i]
+            item['follownoteno'] = str(follownoteno[i])
+            item['browsecount'] = str(browsecount[i])
             item['star'] = str(star[i])
             
             #将评论内容中的emoji表情的url链接替换为emoji表情的对应文字
-            result = re.sub('<img class="emoji-img" src=".*?" alt="\\[', 'emoji(', str(reviewBody[i]))
+            result = re.sub('<img class="emoji-img" src=".*?" alt="\\[', 'emoji(', str(reviewbody[i]))
             result = re.sub(']">', ')', result)
             result = re.sub('<br>', '', result)
-            item['reviewBody'] = result
+            item['reviewbody'] = result
 
-            item['avgPrice'] = str(avgPrice[i])
-            item['userNickName'] = userNickName[i]
-            item['userPower'] = str(userPower[i])
-            item['contentId'] = str(contentId[i])
+            item['avgprice'] = str(avgprice[i])
+            item['usernickname'] = usernickname[i]
+            item['userpower'] = str(userpower[i])
+            item['contentid'] = str(contentid[i])
             yield item
 
 

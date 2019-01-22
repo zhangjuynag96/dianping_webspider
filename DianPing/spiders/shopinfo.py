@@ -57,7 +57,7 @@ class ShopinfoSpider(scrapy.Spider):
         
         #生成初始页面请求,并交予回调函数get_s_shopinfo处理,分析初始加载页面直接加载出来的店铺的信息
         yield scrapy.Request('https://m.dianping.com/nanjing/ch10/{type}'.format(type=type), callback=self.get_s_shopinfo)
-
+        print(shop_counts)
         #将获取到的美食频道下的店铺总数量减去初始加载页面直接加载出来的店铺数量，并按照访问一次ajax数据可获得20家店铺信息的原则，构造出总共需要访问ajax数据的次数.
         count = (int(shop_counts[0]) - s_shop_num) // 20
         
@@ -98,22 +98,21 @@ class ShopinfoSpider(scrapy.Spider):
         s_shopinfo = pattern_shopinfo.findall(response.text)
         for s_shop in s_shopinfo:
             item = ShopInfoItem()
-            item['branchName'] = s_shop[0]
-            item['categoryId'] = s_shop[1]
-            item['categoryName'] = s_shop[2]
-            item['shopId'] = s_shop[3]
-            item['matchText'] = s_shop[4]
+            item['branchname'] = s_shop[0]
+            item['categoryid'] = s_shop[1]
+            item['categoryname'] = s_shop[2]
+            item['shopid'] = s_shop[3]
+            item['matchtext'] = s_shop[4]
             item['name'] = s_shop[5]
-            item['priceText'] = s_shop[6]
+            item['pricetext'] = s_shop[6]
             
             #解决部分店铺没有recommendReason字段的问题
             recommendReason = re.sub('"iconHeight":0,"iconWidth":0,"recommendReason":"', '', s_shop[7])
-            recommendReason = re.sub('"iconHeight":0,"iconWidth":0,"recommendReasonType":0', '', recommendReason)
-            recommendReason = re.sub(',"recommendReasonType":0', '', recommendReason)
-            item['recommendReason'] = recommendReason
+            recommendReason = re.sub('","recommendReasonType":0,"recommendReasonUserId":0', '', recommendReason)
+            item['recommendreason'] = recommendReason
 
-            item['reviewCount'] = s_shop[8]
-            item['shopPower'] = s_shop[9]
+            item['reviewcount'] = s_shop[8]
+            item['shoppower'] = s_shop[9]
             yield item
 
     def get_shopinfo(self,response):
@@ -131,24 +130,23 @@ class ShopinfoSpider(scrapy.Spider):
         reviewCount = jsonpath_rw_ext.match('$..reviewCount',html)
         shopPower = jsonpath_rw_ext.match('$..shopPower',html)
         
-        for i in range(20):
+        for i in range(0,len(name)):
             item = ShopInfoItem()
-            item['branchName'] = branchName[i]
-            item['categoryId'] = str(categoryId[i])
-            item['categoryName'] = categoryName[i]
-            item['shopId'] = id[i]
-            item['matchText'] = matchText[i]
+            item['branchname'] = branchName[i]
+            item['categoryid'] = str(categoryId[i])
+            item['categoryname'] = categoryName[i]
+            item['shopid'] = id[i]
+            item['matchtext'] = matchText[i]
             item['name'] = name[i]
-            item['priceText'] = priceText[i]
+            item['pricetext'] = priceText[i]
 
             #解决部分店铺没有recommendReason字段的问题
-            recommendReason = re.sub("{'iconHeight': 0, 'iconWidth': 0, 'recommendReason': '", '',str(recommendReasonData[i]))
-            recommendReason = re.sub("{'iconHeight': 0, 'iconWidth': 0, 'recommendReasonType': 0}", '', recommendReason)
-            recommendReason = re.sub("', 'recommendReasonType': 0}", '', recommendReason)
-            item['recommendReason'] = recommendReason
+            recommendReason = re.sub("{'iconHeight': 0, 'iconWidth': 0, 'recommendReason': '", '', str(recommendReasonData[i]))
+            recommendReason = re.sub("', 'recommendReasonType': 0, 'recommendReasonUserId': 0}", '', recommendReason)
+            item['recommendreason'] = recommendReason
             
-            item['reviewCount'] = str(reviewCount[i])
-            item['shopPower'] = str(shopPower[i])
+            item['reviewcount'] = str(reviewCount[i])
+            item['shoppower'] = str(shopPower[i])
             yield item
 
 
