@@ -5,7 +5,7 @@
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 from DianPing.settings import *
-from sqlalchemy import create_engine,Column,Integer,String,Table,MetaData
+from sqlalchemy import create_engine,Column,Integer,String,Table,MetaData,DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from DianPing.items import *
@@ -20,16 +20,19 @@ class ShopInfoTemplate():
         数据库shopinfo表的映射类
     '''
     id = Column(Integer, primary_key=True)
-    shopid = Column(String(100))
-    branchname = Column(String(100))
-    categoryid = Column(Integer)
-    categoryname = Column(String(100))
-    matchtext = Column(String(100))
+    shop_id = Column(String(100))
+    branch_name = Column(String(100))
+    category_id = Column(Integer)
+    category_name = Column(String(100))
+    match_text = Column(String(100))
     name = Column(String(100))
-    pricetext = Column(String(100))
-    recommendreason = Column(String(100))
-    reviewcount = Column(Integer)
-    shoppower = Column(Integer)
+    avg_cost = Column(String(100))
+    reason = Column(String(100))
+    review_count = Column(Integer)
+    shop_mark = Column(Integer)
+    created_at = Column(DateTime)
+    updated_at = Column(DateTime)
+    content_id = Column(Integer)
 
     def __init__(self,**items):
         for key in items:
@@ -41,19 +44,22 @@ class CommentsTemplate():
         数据库detail表的映射类
     '''
     id = Column(Integer, primary_key=True)
-    shopid = Column(Integer)
-    shopname = Column(String(100))
-    reviewbody = Column(String(10000))
-    usernickname = Column(String(100))
-    reviewid = Column(Integer)
-    addtime = Column(String(100))
-    lasttime = Column(String(100))
-    follownoteno = Column(Integer)
-    browsecount = Column(Integer)
+    shop_id = Column(Integer)
+    shop_name = Column(String(100))
+    content = Column(String(10000))
+    nick_name = Column(String(100))
+    review_id = Column(Integer)
+    post_at = Column(String(100))
+    modified_at = Column(String(100))
+    comment_amounts = Column(Integer)
+    browse_count = Column(Integer)
     star = Column(Integer)
-    avgprice = Column(Integer)
-    userpower = Column(String(100))
-    contentid = Column(Integer)
+    avg_cost = Column(Integer)
+    user_xp = Column(String(100))
+    show_id = Column(Integer)
+    created_at = Column(DateTime)
+    updated_at = Column(DateTime)
+    content_id = Column(Integer)
 
     def __init__(self,**items):
         for key in items:
@@ -87,7 +93,7 @@ class SqlAlachemyPipeline(object):
 
     def process_item(self,item,spider):
         if isinstance(item,ShopInfoItem):
-            result = self.sess.query(self.shopinfo).filter_by(shopid=item['shopid']).first()
+            result = self.sess.query(self.shopinfo).filter_by(shop_id=item['shop_id']).first()
             if result:
                 pass
             else:
@@ -96,7 +102,7 @@ class SqlAlachemyPipeline(object):
             return item
 
         elif isinstance(item,CommentsItem):
-            exist = self.sess.query(self.Comment).filter_by(lasttime=item['lasttime']).first()
+            exist = self.sess.query(self.Comment).filter_by(modified_at=item['modified_at']).first()
             if exist:
                 pass
             else:

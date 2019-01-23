@@ -6,6 +6,7 @@ import re
 import json
 from DianPing.items import ShopInfoItem,CommentsItem
 import jsonpath_rw_ext
+import datetime
 
 class ShopinfoSpider(scrapy.Spider):
     '''
@@ -98,21 +99,24 @@ class ShopinfoSpider(scrapy.Spider):
         s_shopinfo = pattern_shopinfo.findall(response.text)
         for s_shop in s_shopinfo:
             item = ShopInfoItem()
-            item['branchname'] = s_shop[0]
-            item['categoryid'] = s_shop[1]
-            item['categoryname'] = s_shop[2]
-            item['shopid'] = s_shop[3]
-            item['matchtext'] = s_shop[4]
+            item['branch_name'] = s_shop[0]
+            item['category_id'] = s_shop[1]
+            item['category_name'] = s_shop[2]
+            item['shop_id'] = s_shop[3]
+            item['match_text'] = s_shop[4]
             item['name'] = s_shop[5]
-            item['pricetext'] = s_shop[6]
+            item['avg_cost'] = s_shop[6]
             
             #解决部分店铺没有recommendReason字段的问题
             recommendReason = re.sub('"iconHeight":0,"iconWidth":0,"recommendReason":"', '', s_shop[7])
             recommendReason = re.sub('","recommendReasonType":0,"recommendReasonUserId":0', '', recommendReason)
-            item['recommendreason'] = recommendReason
-
-            item['reviewcount'] = s_shop[8]
-            item['shoppower'] = s_shop[9]
+            item['reason'] = recommendReason
+            
+            item['review_count'] = s_shop[8]
+            item['shop_mark'] = s_shop[9]
+            item['created_at'] = datetime.datetime.now()
+            item['updated_at'] = datetime.datetime.now()
+            item['content_id'] = 0
             yield item
 
     def get_shopinfo(self,response):
@@ -132,21 +136,26 @@ class ShopinfoSpider(scrapy.Spider):
         
         for i in range(0,len(name)):
             item = ShopInfoItem()
-            item['branchname'] = branchName[i]
-            item['categoryid'] = str(categoryId[i])
-            item['categoryname'] = categoryName[i]
-            item['shopid'] = id[i]
-            item['matchtext'] = matchText[i]
+            item['branch_name'] = branchName[i]
+            item['category_id'] = str(categoryId[i])
+            item['category_name'] = categoryName[i]
+            item['shop_id'] = id[i]
+            item['match_text'] = matchText[i]
             item['name'] = name[i]
-            item['pricetext'] = priceText[i]
+            item['avg_cost'] = priceText[i]
 
             #解决部分店铺没有recommendReason字段的问题
-            recommendReason = re.sub("{'iconHeight': 0, 'iconWidth': 0, 'recommendReason': '", '', str(recommendReasonData[i]))
-            recommendReason = re.sub("', 'recommendReasonType': 0, 'recommendReasonUserId': 0}", '', recommendReason)
-            item['recommendreason'] = recommendReason
+            recommendReason = re.sub("{'iconHeight': 0, 'iconWidth': 0,", '', str(recommendReasonData[i]))
+            recommendReason = re.sub("'recommendReasonType': 0, 'recommendReasonUserId': 0}", '', recommendReason)
+            recommendReason = re.sub("'recommendReason': '", '', recommendReason)
+            recommendReason = re.sub("',",'',recommendReason)
+            item['reason'] = recommendReason
             
-            item['reviewcount'] = str(reviewCount[i])
-            item['shoppower'] = str(shopPower[i])
+            item['review_count'] = str(reviewCount[i])
+            item['shop_mark'] = str(shopPower[i])
+            item['created_at'] = datetime.datetime.now()
+            item['updated_at'] = datetime.datetime.now()
+            item['content_id'] = 0
             yield item
 
 

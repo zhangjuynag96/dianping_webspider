@@ -11,6 +11,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from DianPing.pipelines import ShopInfoTemplate
 import jsonpath_rw_ext
+import datetime
 
 class ShopinfoSpider(scrapy.Spider):
     '''
@@ -30,7 +31,7 @@ class ShopinfoSpider(scrapy.Spider):
         sess = session()
         Base = declarative_base()
         shopinfo = type('shopinfo',(Base,ShopInfoTemplate),{'__tablename__':'shopinfo'})
-        ret = sess.query(shopinfo.shopid,shopinfo.reviewcount).all()
+        ret = sess.query(shopinfo.shop_id,shopinfo.review_count).all()
         for i in ret:
             shopid = i[0]
             reviewCount = i[1]
@@ -82,25 +83,34 @@ class ShopinfoSpider(scrapy.Spider):
                 yield emoji_item
 
             item = CommentsItem()
-            item['shopname'] = shopinfo[0][0]
-            item['shopid'] = shopinfo[0][1]
-            item['reviewid'] = s_comment[0]
-            item['addtime'] = s_comment[1]
-            item['lasttime'] = s_comment[2]
-            item['follownoteno'] = s_comment[3]
-            item['browsecount'] = s_comment[4]
+            item['shop_name'] = shopinfo[0][0]
+            item['shop_id'] = shopinfo[0][1]
+            item['review_id'] = s_comment[0]
+            item['post_at'] = s_comment[1]
+            item['modified_at'] = s_comment[2]
+            item['comment_amounts'] = s_comment[3]
+            item['browse_count'] = s_comment[4]
             item['star'] = s_comment[5]
             
             #将评论内容中的emoji表情的url链接替换为emoji表情的对应文字
             result = re.sub(u'<img.*?alt=\\\\"\\[','emoji(',s_comment[6])
             result = re.sub(u'\\]\\\\">',')',result)
             result = re.sub('<br>','',result)
-            item['reviewbody'] = result
+            item['content'] = result
 
-            item['avgprice'] = s_comment[7]
-            item['usernickname'] = s_comment[8]
-            item['userpower'] = s_comment[9]
-            item['contentid'] = s_comment[10]
+            item['avg_cost'] = s_comment[7]
+            item['nick_name'] = s_comment[8]
+            item['user_xp'] = s_comment[9]
+            
+            #解决部分评论信息无show_id的问题
+            try:
+                item['show_id'] = s_comment[10]
+            except IndexError:
+                item['show_id'] = 'null'
+
+            item['created_at'] = datetime.datetime.now()
+            item['updated_at'] = datetime.datetime.now()
+            item['content_id'] = 0
             yield item
 
     def get_comment(self,response):
@@ -131,25 +141,33 @@ class ShopinfoSpider(scrapy.Spider):
                 yield emoji_item
 
             item = CommentsItem()
-            item['shopname'] = shopname[0]
-            item['shopid'] = shopid[0]
-            item['reviewid'] = str(reviewid[i])
-            item['addtime'] = addtime[i]
-            item['lasttime'] = lasttime[i]
-            item['follownoteno'] = str(follownoteno[i])
-            item['browsecount'] = str(browsecount[i])
+            item['shop_name'] = shopname[0]
+            item['shop_id'] = shopid[0]
+            item['review_id'] = str(reviewid[i])
+            item['post_at'] = addtime[i]
+            item['modified_at'] = lasttime[i]
+            item['comment_amounts'] = str(follownoteno[i])
+            item['browse_count'] = str(browsecount[i])
             item['star'] = str(star[i])
             
             #将评论内容中的emoji表情的url链接替换为emoji表情的对应文字
             result = re.sub('<img class="emoji-img" src=".*?" alt="\\[', 'emoji(', str(reviewbody[i]))
             result = re.sub(']">', ')', result)
             result = re.sub('<br>', '', result)
-            item['reviewbody'] = result
+            item['content'] = result
 
-            item['avgprice'] = str(avgprice[i])
-            item['usernickname'] = usernickname[i]
-            item['userpower'] = str(userpower[i])
-            item['contentid'] = str(contentid[i])
+            item['avg_cost'] = str(avgprice[i])
+            item['nick_name'] = usernickname[i]
+            item['user_xp'] = str(userpower[i])
+            #解决部分评论信息没有show_id的问题
+            try:
+                item['show_id'] = str(contentid[i])
+            except IndexError:
+                item['show_id'] = 'null'
+            
+            item['created_at'] = datetime.datetime.now()
+            item['updated_at'] = datetime.datetime.now()
+            item['content_id'] = 0
             yield item
 
 
