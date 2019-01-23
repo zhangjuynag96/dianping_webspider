@@ -64,30 +64,31 @@ class ShopinfoSpider(scrapy.Spider):
         
         #构造每一次ajax请求所需要的data数据
         for page in range(1, count + 2):
-            data_shoplist = {
-                "pageEnName": "shopList",
-                "moduleInfoList": [
-                    {
-                        "moduleName": "mapiSearch",
-                        "query": {
-                            "search": {
-                                "start": page * 20,
-                                "categoryId": "10",
-                                "parentCategoryId": 10,
-                                "locateCityid": 0,
-                                "limit": 20,
-                                "sortId": "2",
-                                "cityId": 5,
-                                "range": "-1",
-                                "maptype": 0,
-                                "keyword": ""
+            for cityId in range(1,2506):
+                data_shoplist = {
+                    "pageEnName": "shopList",
+                    "moduleInfoList": [
+                        {
+                            "moduleName": "mapiSearch",
+                            "query": {
+                                "search": {
+                                    "start": page * 20,
+                                    "categoryId": "10",
+                                    "parentCategoryId": 10,
+                                    "locateCityid": 0,
+                                    "limit": 20,
+                                    "sortId": "2",
+                                    "cityId": {cityId}.format(cityId=cityId),
+                                    "range": "-1",
+                                    "maptype": 0,
+                                    "keyword": ""
+                                }
                             }
                         }
-                    }
-                ]
-            }
-            #构造post请求，获得ajax数据，并交予回调函数get_shopinfo进行处理
-            yield scrapy.Request('https://m.dianping.com/isoapi/module', body=json.dumps(data_shoplist),method='POST',callback=self.get_shopinfo)
+                    ]
+                }
+                #构造post请求，获得ajax数据，并交予回调函数get_shopinfo进行处理
+                yield scrapy.Request('https://m.dianping.com/isoapi/module', body=json.dumps(data_shoplist),method='POST',callback=self.get_shopinfo)
 
     def get_s_shopinfo(self,response):
         #使用正则对数据进行提取
