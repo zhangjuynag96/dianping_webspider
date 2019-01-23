@@ -64,7 +64,8 @@ class ShopinfoSpider(scrapy.Spider):
         
         #构造每一次ajax请求所需要的data数据
         for page in range(1, count + 2):
-            for cityId in range(1,2506):
+            #cityId为每座城市的编号，从1到2506
+            for cityId in range(1,2507):
                 data_shoplist = {
                     "pageEnName": "shopList",
                     "moduleInfoList": [
