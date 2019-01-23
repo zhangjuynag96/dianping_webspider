@@ -78,7 +78,7 @@ class ShopinfoSpider(scrapy.Spider):
                                     "locateCityid": 0,
                                     "limit": 20,
                                     "sortId": "2",
-                                    "cityId": {cityId}.format(cityId=cityId),
+                                    "cityId": cityId,
                                     "range": "-1",
                                     "maptype": 0,
                                     "keyword": ""
